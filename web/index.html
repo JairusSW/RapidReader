@@ -89,12 +89,37 @@
             top: 10px;
             left: 10px;
         }
+
+        .left-box {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            border-radius: 15px;
+            border: 2px dashed lightgrey;
+        }
+
+        .wpm-box,
+        .time-box {
+            color: white;
+            margin: 10px;
+            font-family: Arial;
+        }
     </style>
 </head>
 
 <body>
     <button class="pause-resume" onclick="togglePause()">Start</button>
-    <button onclick="saveProgress()" class="btn btn-primary save-btn"><i class="bi bi-save"></i></button>
+    <!--<button onclick="saveProgress()" class="btn btn-primary save-btn"><i class="bi bi-save"></i></button>-->
+    <div class="left-box">
+        <div class="wpm-box">WPM: <span id="wpm">0</span></div>
+        <div class="time-box">
+            <div>ETA: <span id="timeRemaining">0:00</span></div>
+            <div>Elapsed: <span id="timeElapsed">0:00</span></div>
+        </div>
+    </div>
     <select id="modeSelect" onchange="toggleMode()" class="form-select">
         <option value="word">Word-by-Word</option>
         <option value="line">Line-by-Line</option>
@@ -115,19 +140,22 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.3/dist/js/bootstrap.min.js"></script>
 
     <script>
+        let wordCount = 0;
+        let totalTime = 0;
         let started = false;
         let paused = false;
         let progress = 0;
         let wordByWordMode = true;
         let startTime;
-        let endTime;
         let spacePressed = false; // To prevent multiple starts on space bar press
-
 
         const inputText = document.getElementById("inputText");
         const textNode = document.getElementById("textContainer");
         const speedSelect = document.getElementById("speedSelect");
         const pauseButton = document.getElementsByClassName("pause-resume")[0];
+        const wpmText = document.getElementById("wpm");
+        const etaText = document.getElementById("timeRemaining");
+        const elapsedText = document.getElementById("timeElapsed");
 
         async function togglePause() {
             paused = !paused;
@@ -152,14 +180,26 @@
             startTime = new Date();
 
             const msPerWord = selectedSpeed === "custom" ? textValue : Math.floor((60 * 1000) / selectedSpeed);
-
             const lines = textValue.split("\n");
+
+            let totalWords = 0;
+            for (const line of lines) {
+                const words = line.split(" ");
+                totalWords += words.length;
+            }
+
+            wpmText.innerHTML = 60;
 
             const wordElement = document.createElement("div");
             wordElement.classList.add("current-text");
             wordElement.textContent = "";
             textNode.appendChild(wordElement);
 
+            let secondsElapsed = 0;
+            setInterval(() => {
+                elapsedText.innerHTML = formatTime(1000 * ++secondsElapsed);
+            }, 1000);
+            
             for (let i = 0; i < lines.length; i++) {
                 if (wordByWordMode) {
                     const words = lines[i].split(" ");
@@ -167,6 +207,7 @@
                     for (let j = progress; j < words.length; j++) {
                         await sleep(msPerWord);
                         wordElement.innerHTML = words[j];
+                        wordCount++;
                     }
                     progress = 0;
                 } else {
@@ -182,17 +223,25 @@
                     for (let j = progress; j < words.length; j++) {
                         await sleep(msPerWord);
                         wordElement.textContent += " " + words[j];
+                        wordCount++;
                     }
 
                     wordElement.className = "completed-text";
                     progress = 0;
                 }
             }
+
+            const endTime = new Date();
+            const elapsedMinutes = (endTime - startTime) / 60000;
+            const wpm = Math.round(wordCount / elapsedMinutes);
+            document.getElementById("wpm").innerText = wpm;
+            document.getElementById("timeElapsed").innerText = formatTime(elapsedMinutes * 60000);
         }
 
         function changeSpeed() {
             paused = false;
             progress = 0;
+            wordCount = 0;
             document.getElementById("textNode").innerHTML = "";
         }
 
@@ -214,6 +263,7 @@
 
             paused = false;
             progress = 0;
+            wordCount = 0;
             document.getElementById("textNode").innerHTML = "";
         }
 
@@ -232,6 +282,7 @@
             if (event.code === "Space" && !spacePressed) {
                 spacePressed = true;
                 togglePause();
+                updateRemainingTime(progress, wordCount, new Date() - startTime);
             }
         });
 
@@ -240,6 +291,13 @@
                 spacePressed = false;
             }
         });
+
+        function updateRemainingTime(currentWord, totalWords, elapsedMilliseconds) {
+            const remainingWords = totalWords - currentWord;
+            const estimatedMilliseconds = (elapsedMilliseconds / currentWord) * remainingWords;
+            const remainingTime = formatTime(estimatedMilliseconds);
+            document.getElementById("timeRemaining").innerText = remainingTime;
+        }
     </script>
 </body>
 
