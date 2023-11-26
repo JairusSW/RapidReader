@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Reader</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.3/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Icons CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.18.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: black;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: white;
+        }
+
+        button {
+            background-color: black;
+            color: white;
+            border: 2px dashed lightgrey;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        textarea,
+        select {
+            background-color: black;
+            border: 2px dashed lightgrey;
+            padding: 10px;
+            border-radius: 10px;
+            width: 80%;
+            margin: 10px;
+            resize: none;
+            box-sizing: border-box;
+            color: white;
+        }
+
+        .text {
+            text-align: center;
+            font-size: 35px;
+            font-family: Arial;
+            border-radius: 15px;
+            border: 2px dashed lightgrey;
+            margin: 10px;
+            width: 80%;
+            height: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-y: hidden;
+        }
+
+        .line {
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .completed-line {
+            color: grey;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        .current-line {
+            color: white;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .save-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <button onclick="togglePause()">Pause/Resume</button>
+    <button onclick="saveProgress()" class="btn btn-primary save-btn"><i class="bi bi-save"></i></button>
+    <select id="modeSelect" onchange="toggleMode()" class="form-select">
+        <option value="word">Word-by-Word</option>
+        <option value="line">Line-by-Line</option>
+    </select>
+    <select id="speedSelect" class="form-select" onchange="changeSpeed()">
+        <option value="800">Very Fast</option>
+        <option value="600">Fast</option>
+        <option value="400" selected>Normal</option>
+        <option value="200">Slow</option>
+        <option value="100">Very Slow</option>
+        <option value="custom">Custom</option>
+    </select>
+    <div class="text" id="textContainer">
+    </div>
+    <textarea id="inputText" placeholder="Paste your text here" class="form-control"></textarea>
+
+    <!-- Bootstrap JS and Popper.js (for dropdowns) -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.3/dist/js/bootstrap.min.js"></script>
+
+    <script>
+        let started = false;
+        let paused = false;
+        let progress = 0;
+        let wordByWordMode = true;
+        let startTime;
+        let endTime;
+        let spacePressed = false; // To prevent multiple starts on space bar press
+
+        async function togglePause() {
+            console.log("Toggling pause")
+            paused = !paused;
+            if (!started) {
+                console.log("Starting!")
+                start();
+                started = true;
+            }
+        }
+
+        async function start() {
+            const inputText = document.getElementById("inputText");
+            const textNode = document.getElementById("textContainer");
+            const speedSelect = document.getElementById("speedSelect");
+            const selectedSpeed = speedSelect.options[speedSelect.selectedIndex].value;
+
+            // Get the value before clearing the input
+            const textValue = inputText.value;
+
+            inputText.value = ""; // Clear input text
+            progress = 0;
+            startTime = new Date();
+
+            const msPerWord = selectedSpeed === "custom" ? textValue : Math.floor((60 * 1000) / selectedSpeed);
+
+            const lines = textValue.split("\n");
+
+            for (let i = 0; i < lines.length; i++) {
+                if (wordByWordMode) {
+                    const words = lines[i].split(" ");
+                    await sleep(msPerWord * 1.5);
+                    for (let j = progress; j < words.length; j++) {
+                        await sleep(msPerWord);
+                        textNode.innerHTML = words[j];
+                    }
+                    progress = 0;
+                } else {
+                    const words = lines[i].split(" ");
+                    await sleep(msPerWord * 1.5);
+
+                    let innerHTML = textNode.innerHTML;
+                    const wordElement = document.createElement("div");
+                    wordElement.classList.add("current-line");
+                    wordElement.textContent = "";
+                    textNode.appendChild(wordElement);
+
+                    for (let j = progress; j < words.length; j++) {
+                        await sleep(msPerWord);
+                        wordElement.textContent += " " + words[j];
+                    }
+
+                    wordElement.className = "completed-line";
+                    progress = 0;
+                }
+            }
+        }
+
+        function changeSpeed() {
+            paused = false;
+            progress = 0;
+            document.getElementById("textNode").innerHTML = "";
+        }
+
+        function formatTime(milliseconds) {
+            const minutes = Math.floor(milliseconds / 60000);
+            const seconds = ((milliseconds % 60000) / 1000).toFixed(0);
+            return `${minutes}:${(seconds < 10 ? "0" : "")}${seconds}`;
+        }
+
+        function toggleMode() {
+            const modeSelect = document.getElementById("modeSelect");
+            const selectedMode = modeSelect.options[modeSelect.selectedIndex].value;
+
+            if (selectedMode === "word") {
+                wordByWordMode = true;
+            } else if (selectedMode === "line") {
+                wordByWordMode = false;
+            }
+
+            paused = false;
+            progress = 0;
+            document.getElementById("textNode").innerHTML = "";
+        }
+
+        function saveProgress() {
+            // Add your logic to save the progress
+            alert("Progress saved!");
+        }
+
+        function sleep(ms) {
+            return new Promise((resolve) => {
+                setTimeout(resolve, ms);
+            });
+        }
+
+        document.addEventListener("keydown", function (event) {
+            if (event.code === "Space" && !spacePressed) {
+                spacePressed = true;
+                togglePause();
+            }
+        });
+
+        document.addEventListener("keyup", function (event) {
+            if (event.code === "Space") {
+                spacePressed = false;
+            }
+        });
+    </script>
+</body>
+
+</html>
