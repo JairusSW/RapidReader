@@ -65,13 +65,13 @@
             margin-bottom: 5px;
         }
 
-        .completed-line {
+        .completed-text {
             color: grey;
             text-align: center;
             font-size: 24px;
         }
 
-        .current-line {
+        .current-text {
             color: white;
             text-align: center;
             font-size: 24px;
@@ -93,7 +93,7 @@
 </head>
 
 <body>
-    <button onclick="togglePause()">Pause/Resume</button>
+    <button class="pause-resume" onclick="togglePause()">Start</button>
     <button onclick="saveProgress()" class="btn btn-primary save-btn"><i class="bi bi-save"></i></button>
     <select id="modeSelect" onchange="toggleMode()" class="form-select">
         <option value="word">Word-by-Word</option>
@@ -107,8 +107,7 @@
         <option value="100">Very Slow</option>
         <option value="custom">Custom</option>
     </select>
-    <div class="text" id="textContainer">
-    </div>
+    <div class="text" id="textContainer"></div>
     <textarea id="inputText" placeholder="Paste your text here" class="form-control"></textarea>
 
     <!-- Bootstrap JS and Popper.js (for dropdowns) -->
@@ -124,20 +123,25 @@
         let endTime;
         let spacePressed = false; // To prevent multiple starts on space bar press
 
+
+        const inputText = document.getElementById("inputText");
+        const textNode = document.getElementById("textContainer");
+        const speedSelect = document.getElementById("speedSelect");
+        const pauseButton = document.getElementsByClassName("pause-resume")[0];
+
         async function togglePause() {
-            console.log("Toggling pause")
             paused = !paused;
             if (!started) {
-                console.log("Starting!")
                 start();
                 started = true;
+                paused = false;
+                pauseButton.innerHTML = "Pause";
+            } else {
+                pauseButton.innerHTML = paused ? "Resume" : "Pause";
             }
         }
 
         async function start() {
-            const inputText = document.getElementById("inputText");
-            const textNode = document.getElementById("textContainer");
-            const speedSelect = document.getElementById("speedSelect");
             const selectedSpeed = speedSelect.options[speedSelect.selectedIndex].value;
 
             // Get the value before clearing the input
@@ -151,13 +155,18 @@
 
             const lines = textValue.split("\n");
 
+            const wordElement = document.createElement("div");
+            wordElement.classList.add("current-text");
+            wordElement.textContent = "";
+            textNode.appendChild(wordElement);
+
             for (let i = 0; i < lines.length; i++) {
                 if (wordByWordMode) {
                     const words = lines[i].split(" ");
                     await sleep(msPerWord * 1.5);
                     for (let j = progress; j < words.length; j++) {
                         await sleep(msPerWord);
-                        textNode.innerHTML = words[j];
+                        wordElement.innerHTML = words[j];
                     }
                     progress = 0;
                 } else {
@@ -166,7 +175,7 @@
 
                     let innerHTML = textNode.innerHTML;
                     const wordElement = document.createElement("div");
-                    wordElement.classList.add("current-line");
+                    wordElement.classList.add("current-text");
                     wordElement.textContent = "";
                     textNode.appendChild(wordElement);
 
@@ -175,7 +184,7 @@
                         wordElement.textContent += " " + words[j];
                     }
 
-                    wordElement.className = "completed-line";
+                    wordElement.className = "completed-text";
                     progress = 0;
                 }
             }
