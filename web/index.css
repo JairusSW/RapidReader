@@ -1,0 +1,97 @@
+body {
+    background-color: black;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    color: white;
+}
+
+button {
+    background-color: black;
+    color: white;
+    border: 2px dashed lightgrey;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    margin: 10px;
+}
+
+textarea,
+select {
+    background-color: black;
+    border: 2px dashed lightgrey;
+    padding: 10px;
+    border-radius: 10px;
+    width: 80%;
+    margin: 10px;
+    resize: none;
+    box-sizing: border-box;
+    color: white;
+}
+
+.text {
+    text-align: center;
+    font-size: 35px;
+    font-family: Arial;
+    border-radius: 15px;
+    border: 2px dashed lightgrey;
+    margin: 10px;
+    width: 80%;
+    height: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-y: hidden;
+}
+
+.line {
+    color: white;
+    margin-bottom: 5px;
+}
+
+.completed-text {
+    color: grey;
+    text-align: center;
+    font-size: 35px;
+}
+
+.current-text {
+    color: white;
+    text-align: center;
+    font-size: 35px;
+}
+
+.controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.save-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+.left-box {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border-radius: 15px;
+    border: 2px dashed lightgrey;
+}
+
+.wpm-box,
+.time-box {
+    color: white;
+    margin: 10px;
+    font-family: Arial;
+}
