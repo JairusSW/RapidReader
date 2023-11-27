@@ -1,3 +1,4 @@
+const maxCharsDisplayed = 60;
 let wordCount = 0;
 let totalTime = 0;
 let started = false;
@@ -8,48 +9,67 @@ let startTime;
 let spacePressed = false; // To prevent multiple starts on space bar press
 
 const inputText = document.getElementById("inputText");
-const textNode = document.getElementById("textContainer");
 const speedSelect = document.getElementById("speedSelect");
-const pauseButton = document.getElementsByClassName("pause-resume")[0];
+const modeSelect = document.getElementById("modeSelect");
+const playPause = document.getElementsByClassName("pause-resume")[0];
 const wpmText = document.getElementById("wpm");
 const etaText = document.getElementById("timeRemaining");
 const elapsedText = document.getElementById("timeElapsed");
+let textNode;
 
-async function togglePause() {
-    paused = !paused;
-    if (!started) {
-        start();
-        started = true;
-        paused = false;
-        pauseButton.innerHTML = "Pause";
-    } else {
-        pauseButton.innerHTML = paused ? "Resume" : "Pause";
-    }
-}
+let selectedSpeed;
+let textValue;
+let msPerWord;
+let msPerLine;
+
+let pausePromise;
+let lines;
+
+let totalLines = 0;
+let totalWords = 0;
+let totalPeriods = 0;
+let totalCommas = 0;
 
 async function start() {
-    const selectedSpeed = speedSelect.options[speedSelect.selectedIndex].value;
+    textNode = document.createElement("div"); // Create the div element
+    textNode.id = "textContainer";
+    textNode.className = "text";
+    document.body.appendChild(textNode);
+
+    inputText.hidden = true;
+    speedSelect.hidden = true;
+    modeSelect.hidden = true;
+    playPause.hidden = true;
+
+    textNode.hidden = false;
+    textNode.innerHTML = "";
+    selectedSpeed = speedSelect.options[speedSelect.selectedIndex].value;
 
     // Get the value before clearing the input
-    const textValue = inputText.value;
+    textValue = inputText.value.trim();
 
     inputText.value = ""; // Clear input text
     progress = 0;
     startTime = new Date();
 
-    const msPerWord = selectedSpeed === "custom" ? textValue : Math.floor((60 * 1000) / selectedSpeed);
-    const msPerLine = msPerWord * 1.5;
-    const lines = textValue.split("\n");
+    msPerWord = selectedSpeed === "custom" ? textValue : Math.floor((60 * 1000) / selectedSpeed);
+    msPerLine = msPerWord * 1.5;
 
-    let totalWords = 0;
+    lines = textValue.split("\n");
+
+    totalLines = lines.length;
     for (const line of lines) {
         const words = line.split(" ");
         totalWords += words.length;
+        for (const word of words) {
+            if (word.endsWith(".")) totalPeriods++;
+            else if (word.endsWith(",")) totalCommas++;
+        }
     }
 
-    wpmText.innerHTML = 60;
-    console.log("ETA: " + ((lines.length * msPerLine) + (totalWords * msPerWord)))
+    wpmText.innerHTML = selectedSpeed;
     etaText.innerText = getETA((lines.length * msPerLine) + (totalWords * msPerWord));
+
     const wordElement = document.createElement("div");
     wordElement.classList.add("current-text");
     wordElement.textContent = "";
@@ -57,30 +77,36 @@ async function start() {
 
     let secondsElapsed = 0;
     setInterval(() => {
-        elapsedText.innerHTML = getETA(1000 * ++secondsElapsed);
+        if (!paused) elapsedText.innerHTML = getETA(1000 * ++secondsElapsed);
     }, 1000);
 
     for (let i = 0; i < lines.length; i++) {
         if (wordByWordMode) {
             const words = lines[i].split(" ");
-            await sleep(msPerWord * 1.5);
             for (let j = progress; j < words.length; j++) {
-                await sleep(msPerWord);
-                wordElement.innerHTML = words[j];
+                if (paused) {
+                    await pausePromise;
+                }
+                const word = words[j];
+                wordElement.innerHTML = word;
                 wordCount++;
+                await sleep(msPerWord);
             }
+            await sleep(msPerWord * 0.5);
             progress = 0;
         } else {
             const words = lines[i].split(" ");
             await sleep(msPerWord * 1.5);
 
-            let innerHTML = textNode.innerHTML;
             const wordElement = document.createElement("div");
             wordElement.classList.add("current-text");
             wordElement.textContent = "";
             textNode.appendChild(wordElement);
 
             for (let j = progress; j < words.length; j++) {
+                if (paused) {
+                    await pausePromise;
+                }
                 await sleep(msPerWord);
                 wordElement.textContent += " " + words[j];
                 wordCount++;
@@ -98,11 +124,40 @@ async function start() {
     document.getElementById("timeElapsed").innerText = formatTime(elapsedMinutes * 60000);
 }
 
+async function togglePause() {
+    paused = !paused;
+    if (!started) {
+        start();
+        started = true;
+        paused = false;
+    } else {
+        if (paused) {
+            pausePromise = new Promise(resolve => {
+                let down = false;
+                const resumeHandler = (event) => {
+                    if (down) return;
+                    if (event.code === "Space") {
+                        down = true;
+                    }
+                    spacePressed = false;
+                    resolve();
+                    document.removeEventListener("keydown", resumeHandler);
+                };
+                document.addEventListener("keydown", resumeHandler);
+            });
+            await pausePromise;
+        }
+    }
+}
+
 function changeSpeed() {
-    paused = false;
-    progress = 0;
-    wordCount = 0;
-    document.getElementById("textNode").innerHTML = "";
+    selectedSpeed = speedSelect.options[speedSelect.selectedIndex].value;
+
+    msPerWord = selectedSpeed === "custom" ? textValue : Math.floor((60 * 1000) / selectedSpeed);
+    msPerLine = msPerWord * 1.5;
+
+    wpmText.innerHTML = selectedSpeed;
+    etaText.innerText = getETA((lines.length * msPerLine) + (totalWords * msPerWord));
 }
 
 function formatTime(milliseconds) {
@@ -130,7 +185,6 @@ function getETA(milliseconds) {
 }
 
 function toggleMode() {
-    const modeSelect = document.getElementById("modeSelect");
     const selectedMode = modeSelect.options[modeSelect.selectedIndex].value;
 
     if (selectedMode === "word") {
@@ -142,7 +196,7 @@ function toggleMode() {
     paused = false;
     progress = 0;
     wordCount = 0;
-    document.getElementById("textNode").innerHTML = "";
+    textNode.innerHTML = ""; // Corrected the id to match the HTML
 }
 
 function saveProgress() {

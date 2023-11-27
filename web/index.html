@@ -11,32 +11,180 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.18.0/font/bootstrap-icons.css">
 
     <link rel="stylesheet" href="./index.css">
+    <style>
+        body {
+            background-color: black;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: white;
+        }
+
+        .main-container {
+            padding: 1%;
+            /* Responsive padding */
+            width: 98%;
+            /* Full width */
+            overflow: hidden;
+            /* Hide overflow when .text is visible */
+        }
+
+        .left-box {
+            position: absolute;
+            top: 1%;
+            left: 1%;
+            border-radius: 10px;
+            border: 2px dashed lightgrey;
+            padding: 1%;
+            width: 8%;
+            /* Adjusted width */
+        }
+
+        .wpm-box,
+        .time-box {
+            color: white;
+            margin: 1%;
+            width: 100%;
+            font-family: Arial;
+        }
+
+        button {
+            background-color: black;
+            color: white;
+            border: 2px dashed lightgrey;
+            padding: 1% 2%;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 1%;
+        }
+
+        .text {
+            text-align: center;
+            font-family: Arial;
+            border-radius: 10px;
+            border: 2px dashed lightgrey;
+            margin: 1%;
+            width: 60%;
+            /* Adjust the width as needed */
+            height: 60vh;
+            /* Adjust the height as needed */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-y: hidden;
+            color: gray;
+            /* Initially invisible */
+            font-size: 35px;
+            /* Adjust the font size as needed */
+        }
+
+        /* Add a media query for smaller screens if necessary */
+        @media (max-width: 768px) {
+            .text {
+                width: 90%;
+                /* Adjust the width for smaller screens */
+                height: 50vh;
+                /* Adjust the height for smaller screens */
+                font-size: 18px;
+                /* Adjust the font size for smaller screens */
+            }
+        }
+
+        .line {
+            color: white;
+            margin-bottom: 1%;
+        }
+
+        .completed-text {
+            color: grey;
+            text-align: center;
+        }
+
+        .current-text {
+            color: white;
+            text-align: center;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            /* Full width */
+        }
+
+        .save-btn {
+            position: absolute;
+            top: 1%;
+            left: 1%;
+        }
+
+        textarea,
+        select {
+            background-color: black;
+            border: 2px dashed lightgrey;
+            padding: 1%;
+            border-radius: 10px;
+            width: 98%;
+            /* Adjusted width */
+            margin: 1%;
+            resize: none;
+            box-sizing: border-box;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .left-box {
+                position: relative;
+                width: 100%;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .text {
+                visibility: hidden;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <button class="pause-resume" onclick="togglePause()">Start</button>
-    <!--<button onclick="saveProgress()" class="btn btn-primary save-btn"><i class="bi bi-save"></i></button>-->
-    <div class="left-box">
-        <div class="wpm-box">WPM: <span id="wpm">-</span></div>
-        <div class="time-box">
-            <div>ETA: <span id="timeRemaining">-</span></div>
-            <div>Elapsed: <span id="timeElapsed">-</span></div>
+    <div class="main-container">
+        <div class="stats-container">
+            <div class="left-box">
+                <div class="wpm-box">WPM: <span id="wpm">-</span></div>
+                <div class="time-box">
+                    <div>ETA: <span id="timeRemaining">-</span></div>
+                    <div>Elapsed: <span id="timeElapsed">-</span></div>
+                </div>
+            </div>
         </div>
+        <div class="controls">
+            <select id="modeSelect" onchange="toggleMode()" class="form-select">
+                <option value="word">Word-by-Word</option>
+                <option value="line">Line-by-Line</option>
+            </select>
+            <select id="speedSelect" class="form-select" onchange="changeSpeed()">
+                <option value="1000">Extreme</option>
+                <option value="800">Very Fast</option>
+                <option value="600">Fast</option>
+                <option value="400" selected>Normal</option>
+                <option value="200">Slow</option>
+                <option value="100">Very Slow</option>
+                <option value="custom">Custom</option>
+            </select>
+            <button class="pause-resume" onclick="togglePause()">Start</button>
+        </div>
+        <textarea id="inputText" placeholder="Paste your text here" class="form-control"></textarea>
     </div>
-    <select id="modeSelect" onchange="toggleMode()" class="form-select">
-        <option value="word">Word-by-Word</option>
-        <option value="line">Line-by-Line</option>
-    </select>
-    <select id="speedSelect" class="form-select" onchange="changeSpeed()">
-        <option value="800">Very Fast</option>
-        <option value="600">Fast</option>
-        <option value="400" selected>Normal</option>
-        <option value="200">Slow</option>
-        <option value="100">Very Slow</option>
-        <option value="custom">Custom</option>
-    </select>
-    <div class="text" id="textContainer"></div>
-    <textarea id="inputText" placeholder="Paste your text here" class="form-control"></textarea>
 
     <!-- Bootstrap JS and Popper.js (for dropdowns) -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
