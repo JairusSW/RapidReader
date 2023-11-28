@@ -1,0 +1,120 @@
+body {
+    background-color: black;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    color: white;
+}
+
+.main-container {
+    margin: 1%;
+    width: 98%;
+    overflow: hidden;
+}
+
+.left-box {
+    position: absolute;
+    border-radius: 10px;
+    border: 2px dashed lightgrey;
+    padding: 1%;
+    width: 8%;
+    margin: 1%;
+}
+
+.wpm-box,
+.time-box {
+    color: white;
+    margin: 1%;
+    width: 100%;
+    font-family: Arial;
+}
+
+button {
+    background-color: black;
+    color: white;
+    border: 2px dashed lightgrey;
+    padding: 1% 2%;
+    border-radius: 10px;
+    cursor: pointer;
+    margin: 1%;
+}
+
+.text {
+    text-align: center;
+    font-family: Arial;
+    border-radius: 10px;
+    border: 2px dashed lightgrey;
+    margin: 1%;
+    width: 70%;
+    height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-y: hidden;
+    color: gray;
+    font-size: 35px;
+}
+
+.line {
+    color: white;
+    margin-bottom: 1%;
+}
+
+.completed-text {
+    color: grey;
+    text-align: center;
+}
+
+.current-text {
+    color: white;
+    text-align: center;
+}
+
+.controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.save-btn {
+    position: absolute;
+    top: 1%;
+    left: 1%;
+}
+
+textarea,
+select {
+    background-color: black;
+    border: 2px dashed lightgrey;
+    padding: 1%;
+    border-radius: 10px;
+    width: 98%;
+    margin: 1%;
+    resize: none;
+    box-sizing: border-box;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .left-box {
+        position: relative;
+        width: 30%;
+    }
+
+    .text {
+        width: 90%;
+        height: 50vh;
+        font-size: 18px;
+    }
+
+    .controls {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

@@ -31,7 +31,7 @@ let totalPeriods = 0;
 let totalCommas = 0;
 
 async function start() {
-    textNode = document.createElement("div"); // Create the div element
+    textNode = document.createElement("div");
     textNode.id = "textContainer";
     textNode.className = "text";
     document.body.appendChild(textNode);
@@ -45,10 +45,9 @@ async function start() {
     textNode.innerHTML = "";
     selectedSpeed = speedSelect.options[speedSelect.selectedIndex].value;
 
-    // Get the value before clearing the input
     textValue = inputText.value.trim();
 
-    inputText.value = ""; // Clear input text
+    inputText.value = "";
     progress = 0;
     startTime = new Date();
 
@@ -196,11 +195,10 @@ function toggleMode() {
     paused = false;
     progress = 0;
     wordCount = 0;
-    textNode.innerHTML = ""; // Corrected the id to match the HTML
+    textNode.innerHTML = "";
 }
 
 function saveProgress() {
-    // Add your logic to save the progress
     alert("Progress saved!");
 }
 
@@ -214,7 +212,6 @@ document.addEventListener("keydown", function (event) {
     if (event.code === "Space" && !spacePressed) {
         spacePressed = true;
         togglePause();
-        updateRemainingTime(progress, wordCount, new Date() - startTime);
     }
 });
 
@@ -223,10 +220,3 @@ document.addEventListener("keyup", function (event) {
         spacePressed = false;
     }
 });
-
-function updateRemainingTime(currentWord, totalWords, elapsedMilliseconds) {
-    const remainingWords = totalWords - currentWord;
-    const estimatedMilliseconds = (elapsedMilliseconds / currentWord) * remainingWords;
-    const remainingTime = formatTime(estimatedMilliseconds);
-    //document.getElementById("timeRemaining").innerText = remainingTime;
-}
