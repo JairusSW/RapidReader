@@ -16,6 +16,8 @@ So I threw this app together and I use it to train myself and to cram before a b
 Open up [RapidReader](https://jairussw.github.io/rapidreader.github.io/), paste the text you want to read, and click start.
 You can press space to start and stop.
 
+You can find a section of Dante's Inferno to read [HERE](https://github.com/JairusSW/RapidReader/raw/master/assets/books/dante-inferno/1.txt)
+
 #### Contributing
 
 Contributions are welcome! This project is in a very early stage and any features would be welcome in the form of a PR request.
