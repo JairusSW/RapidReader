@@ -18,6 +18,8 @@ You can press space to start and stop.
 
 You can find a section of Dante's Inferno to read [HERE](https://github.com/JairusSW/RapidReader/raw/master/assets/books/dante-inferno/1.txt)
 
+TIP: Try using the line-by-line mode if you can't comprehend it!
+
 #### Contributing
 
 Contributions are welcome! This project is in a very early stage and any features would be welcome in the form of a PR request.
