@@ -1,5 +1,5 @@
 # Rapid Reader
-**The new way to read for ADHD people**
+**The new way to read**
 
 #### Motivation
 
