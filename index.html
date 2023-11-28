@@ -24,7 +24,7 @@
         }
 
         .main-container {
-            padding: 1%;
+            margin: 1%;
             /* Responsive padding */
             width: 98%;
             /* Full width */
@@ -34,12 +34,11 @@
 
         .left-box {
             position: absolute;
-            top: 1%;
-            left: 1%;
             border-radius: 10px;
             border: 2px dashed lightgrey;
             padding: 1%;
             width: 8%;
+            margin: 1%;
             /* Adjusted width */
         }
 
@@ -67,7 +66,7 @@
             border-radius: 10px;
             border: 2px dashed lightgrey;
             margin: 1%;
-            width: 60%;
+            width: 70%;
             /* Adjust the width as needed */
             height: 60vh;
             /* Adjust the height as needed */
@@ -80,18 +79,6 @@
             /* Initially invisible */
             font-size: 35px;
             /* Adjust the font size as needed */
-        }
-
-        /* Add a media query for smaller screens if necessary */
-        @media (max-width: 768px) {
-            .text {
-                width: 90%;
-                /* Adjust the width for smaller screens */
-                height: 50vh;
-                /* Adjust the height for smaller screens */
-                font-size: 18px;
-                /* Adjust the font size for smaller screens */
-            }
         }
 
         .line {
@@ -141,16 +128,21 @@
         @media (max-width: 768px) {
             .left-box {
                 position: relative;
-                width: 100%;
+                width: 30%;
+            }
+
+            .text {
+                width: 90%;
+                /* Adjust the width for smaller screens */
+                height: 50vh;
+                /* Adjust the height for smaller screens */
+                font-size: 18px;
+                /* Adjust the font size for smaller screens */
             }
 
             .controls {
                 flex-direction: column;
                 align-items: flex-start;
-            }
-
-            .text {
-                visibility: hidden;
             }
         }
     </style>
@@ -158,15 +150,15 @@
 
 <body>
     <div class="main-container">
-        <div class="stats-container">
-            <div class="left-box">
-                <div class="wpm-box">WPM: <span id="wpm">-</span></div>
-                <div class="time-box">
-                    <div>ETA: <span id="timeRemaining">-</span></div>
-                    <div>Elapsed: <span id="timeElapsed">-</span></div>
+            <div class="stats-container">
+                <div class="left-box">
+                    <div class="wpm-box">WPM: <span id="wpm">-</span></div>
+                    <div class="time-box">
+                        <div>ETA: <span id="timeRemaining">-</span></div>
+                        <div>Elapsed: <span id="timeElapsed">-</span></div>
+                    </div>
                 </div>
             </div>
-        </div>
         <div class="controls">
             <select id="modeSelect" onchange="toggleMode()" class="form-select">
                 <option value="word">Word-by-Word</option>
